@@ -12,7 +12,7 @@ const databaseUrl =
 
 module.exports = {
   dialect: dbProvider,
-  schema: dbProvider === "mysql" ? "./src/schema/mysql.ts" : "./src/schema/postgres.ts",
+  schema: dbProvider === "mysql" ? "./dist/schema/mysql.js" : "./dist/schema/postgres.js",
   out: "./drizzle",
   dbCredentials: {
     url: databaseUrl,
