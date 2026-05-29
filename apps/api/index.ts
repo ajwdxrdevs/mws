@@ -136,6 +136,16 @@ app.get("/health", (req, res) => {
   });
 });
 
+// Root welcome/status endpoint
+app.get("/", (req, res) => {
+  res.json({
+    message: "WhatsApp Blast API Server is running",
+    status: "active",
+    healthCheck: "/health"
+  });
+});
+
+
 // Now apply global body parsing middleware for other routes
 // Increased limit for base64 uploads (campaign attachments)
 app.use(express.json({ limit: "50mb" }));
