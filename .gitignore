@@ -6,12 +6,18 @@ dist
 .DS_Store
 
 # Local environment
+.env
 .env.local
 .env.*.local
 
 # Runtime data and uploads
+data/
+apps/api/data/
 apps/api/data/uploads/
 apps/api/data/*/
+sessions/
+apps/api/sessions/
+
 
 # Temporary odd shell artifacts
 statement-breakpoint

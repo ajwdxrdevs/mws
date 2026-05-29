@@ -22,6 +22,7 @@ import campaignsRoutes from "./src/routes/campaigns.routes.js";
 import conversationsRoutes from "./src/routes/conversations.routes.js";
 import botRoutes from "./src/routes/bot.routes.js";
 import profileRoutes from "./src/routes/profile.routes.js";
+import messagesRoutes from "./src/routes/messages.routes.js";
 
 // Services
 import { setupSocketHandlers } from "./src/socket/handlers.js";
@@ -149,6 +150,7 @@ app.use("/api/campaigns", campaignsRoutes);
 app.use("/api/conversations", conversationsRoutes);
 app.use("/api/bot", botRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/messages", messagesRoutes);
 
 // Socket.io handlers
 setupSocketHandlers(io);
