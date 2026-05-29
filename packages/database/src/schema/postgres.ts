@@ -1,5 +1,5 @@
 import { pgTable, text, timestamp, boolean, integer, json, jsonb, primaryKey } from "drizzle-orm/pg-core";
-import { createSchema } from "./factory";
+import { createSchema } from "./factory.js";
 
 const createdSchema = createSchema({
   table: pgTable,

@@ -1,5 +1,5 @@
 import { mysqlTable, text, timestamp, boolean, int, json, primaryKey } from "drizzle-orm/mysql-core";
-import { createSchema } from "./factory";
+import { createSchema } from "./factory.js";
 
 const mysqlTimestamp = (name: string) => timestamp(name, { mode: "date" });
 
