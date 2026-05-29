@@ -50,6 +50,10 @@ console.log(`[Kill Port] Checking ports: ${backendPort} (backend), ${frontendPor
 const isWindows = process.platform === "win32";
 
 async function killPort(port) {
+  if (process.env.NODE_ENV === "production" || process.env.RAILWAY_ENVIRONMENT) {
+    console.log(`[Kill Port] Production/Railway environment detected. Skipping port ${port} clearing.`);
+    return;
+  }
   try {
     if (isWindows) {
       const { stdout } = await execAsync(`netstat -ano | findstr :${port}`);
@@ -76,6 +80,10 @@ async function killPort(port) {
         const pids = stdout.trim().split("\n").filter(Boolean);
 
         for (const pid of pids) {
+          if (pid === "1") {
+            console.log(`[Kill Port] Skipping PID 1 (port ${port}) to prevent container crash.`);
+            continue;
+          }
           console.log(`[Kill Port] Killing PID ${pid} (port ${port})...`);
           await execAsync(`kill -9 ${pid}`);
         }
