@@ -164,6 +164,9 @@ setMessageStorageSocketIO(io);
 // Export io for use in other modules
 export { io };
 
+export default app;
+
+
 // Start server
 // In Pterodactyl the frontend and backend use different ports. Prefer BACKEND_PORT
 // for the API server, then fall back to PORT for local/dev compatibility.
