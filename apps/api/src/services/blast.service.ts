@@ -42,6 +42,20 @@ export function resumeCampaign(campaignId: string) {
   activeCampaigns.add(campaignId);
 }
 
+// Helper to parse Spintax like {Hello|Hi|Salam}
+function parseSpintax(text: string): string {
+  const spintaxPattern = /\{([^{}]+)\}/g;
+  let matches;
+  let newText = text;
+  while ((matches = spintaxPattern.exec(newText)) !== null) {
+    const options = matches[1].split('|');
+    const randomOption = options[Math.floor(Math.random() * options.length)];
+    newText = newText.replace(matches[0], randomOption);
+    spintaxPattern.lastIndex = 0;
+  }
+  return newText;
+}
+
 // Personalize message with contact data
 function personalizeMessage(message: string, contact: {
   name: string | null;
@@ -80,7 +94,7 @@ function personalizeMessage(message: string, contact: {
     }
   }
 
-  return personalized;
+  return parseSpintax(personalized);
 }
 
 // Get random delay between min and max
@@ -371,6 +385,23 @@ export async function processCampaign(campaignId: string): Promise<void> {
           customData: recipient.customData,
         });
 
+        // Check if number is on WhatsApp first to avoid spam trigger
+        console.log(`[Blast] Checking if ${recipient.phoneNumber} is registered on WhatsApp...`);
+        try {
+          const numberCheck = await wa.checkNumber(recipient.phoneNumber);
+          if (numberCheck && !numberCheck.isOnWhatsApp) {
+            console.log(`[Blast] Nombor ${recipient.phoneNumber} tiada dalam WhatsApp. Menandakan sebagai gagal.`);
+            throw new Error("Nombor telefon tidak berdaftar dengan WhatsApp");
+          }
+        } catch (checkError: any) {
+          // If the check itself fails (e.g., timeout), log and proceed to avoid blocking healthy sends
+          console.log(`[Blast] WhatsApp registry check failed for ${recipient.phoneNumber}, proceeding anyway:`, checkError.message || checkError);
+          // If it is our thrown error, re-throw it to fail this recipient
+          if (checkError.message === "Nombor telefon tidak berdaftar dengan WhatsApp") {
+            throw checkError;
+          }
+        }
+
         console.log(`[Blast] Message prepared, sending...`);
 
         // Send message based on media type (with retry for timeouts)
@@ -535,8 +566,8 @@ export async function processCampaign(campaignId: string): Promise<void> {
         // Delay between sends to avoid rate limiting
         if (sentCount < recipients.length) {
           const delay = getRandomDelay(
-            campaign.delayMin || 3000,
-            campaign.delayMax || 10000
+            campaign.delayMin !== undefined ? campaign.delayMin : 20000,
+            campaign.delayMax !== undefined ? campaign.delayMax : 60000
           );
           console.log(`[Blast] Waiting ${delay}ms before next send...`);
           await new Promise(resolve => setTimeout(resolve, delay));

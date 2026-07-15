@@ -681,6 +681,17 @@ export class WhatsAppService extends EventEmitter {
     console.log(`[${this.userId}] 📤 Sending message to ${jid}: "${text}"`);
 
     try {
+      // Simulate typing behavior (presence: composing)
+      try {
+        await this.socket.sendPresenceUpdate("composing", jid);
+        // Random typing duration: 15ms per character, between 1.5s and 4s
+        const typingDelay = Math.min(Math.max(text.length * 15, 1500), 4000);
+        await new Promise(resolve => setTimeout(resolve, typingDelay));
+        await this.socket.sendPresenceUpdate("paused", jid);
+      } catch (presenceError) {
+        console.log(`[${this.userId}] Failed to send presence composing:`, presenceError);
+      }
+
       const result = await this.socket.sendMessage(jid, { text });
       console.log(`[${this.userId}] ✅ Message sent successfully`);
       return result;
@@ -714,6 +725,18 @@ export class WhatsAppService extends EventEmitter {
     }
 
     const jid = to.includes("@s.whatsapp.net") ? to : `${to}@s.whatsapp.net`;
+
+    if (caption) {
+      try {
+        await this.socket.sendPresenceUpdate("composing", jid);
+        const typingDelay = Math.min(Math.max(caption.length * 15, 1500), 4000);
+        await new Promise(resolve => setTimeout(resolve, typingDelay));
+        await this.socket.sendPresenceUpdate("paused", jid);
+      } catch (presenceError) {
+        // Ignore
+      }
+    }
+
     return this.socket.sendMessage(jid, {
       image: imageBuffer,
       caption: caption || "",
@@ -726,6 +749,18 @@ export class WhatsAppService extends EventEmitter {
     }
 
     const jid = to.includes("@s.whatsapp.net") ? to : `${to}@s.whatsapp.net`;
+
+    if (caption) {
+      try {
+        await this.socket.sendPresenceUpdate("composing", jid);
+        const typingDelay = Math.min(Math.max(caption.length * 15, 1500), 4000);
+        await new Promise(resolve => setTimeout(resolve, typingDelay));
+        await this.socket.sendPresenceUpdate("paused", jid);
+      } catch (presenceError) {
+        // Ignore
+      }
+    }
+
     const message: any = {
       document: docBuffer,
       fileName: filename,
@@ -743,6 +778,18 @@ export class WhatsAppService extends EventEmitter {
     }
 
     const jid = to.includes("@s.whatsapp.net") ? to : `${to}@s.whatsapp.net`;
+
+    if (caption) {
+      try {
+        await this.socket.sendPresenceUpdate("composing", jid);
+        const typingDelay = Math.min(Math.max(caption.length * 15, 1500), 4000);
+        await new Promise(resolve => setTimeout(resolve, typingDelay));
+        await this.socket.sendPresenceUpdate("paused", jid);
+      } catch (presenceError) {
+        // Ignore
+      }
+    }
+
     return this.socket.sendMessage(jid, {
       video: videoBuffer,
       caption: caption || "",

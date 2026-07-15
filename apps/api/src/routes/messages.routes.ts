@@ -105,6 +105,19 @@ router.post("/", async (req, res) => {
       return res.status(503).json({ error: `WhatsApp client is not connected for session user: ${userId}` });
     }
 
+    // Check if number is on WhatsApp first to avoid spam trigger
+    console.log(`[Messages API] Checking if ${finalPhone} is registered on WhatsApp...`);
+    try {
+      const numberCheck = await wa.checkNumber(finalPhone);
+      if (numberCheck && !numberCheck.isOnWhatsApp) {
+        console.log(`[Messages API] Nombor ${finalPhone} tiada dalam WhatsApp. Menolak penghantaran.`);
+        return res.status(400).json({ error: "Nombor telefon tidak berdaftar dengan WhatsApp" });
+      }
+    } catch (checkError: any) {
+      // If the check itself fails (e.g. timeout), log but proceed to avoid blocking
+      console.log(`[Messages API] WhatsApp registry check failed for ${finalPhone}, proceeding anyway:`, checkError.message || checkError);
+    }
+
     // 4. Send the message via Baileys wrapper
     const jid = formatPhoneToJid(finalPhone);
     console.log(`[Messages API] Sending message to ${jid} using session ${userId}`);

@@ -513,8 +513,8 @@ router.post("/", async (req, res) => {
       status: scheduledAt ? "scheduled" : "draft",
       recipientCount: recipientIds?.length || 0,
       scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
-      delayMin: delayMin || 3000,
-      delayMax: delayMax || 10000,
+      delayMin: delayMin !== undefined ? delayMin : 20000,
+      delayMax: delayMax !== undefined ? delayMax : 60000,
     });
 
     // Add recipients if provided
